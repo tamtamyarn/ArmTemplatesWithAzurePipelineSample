@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "isLinux": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "appServicePlanSku": {
+      "type": "string"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "reserved": "[parameters('isLinux')]"
+      },
+      "sku": {
+        "name": "[parameters('appServicePlanSku')]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
