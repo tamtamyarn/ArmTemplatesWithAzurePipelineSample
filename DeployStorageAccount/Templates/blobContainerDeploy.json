@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "type": "string"
+    },
+    "containers": {
+      "type": "array"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "name": "[concat(parameters('storageAccountName'), '/', 'default')]",
+      "apiVersion": "2019-04-01",
+      "properties": { }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "name": "[concat(parameters('storageAccountName'), '/', 'default', '/', parameters('containers')[copyIndex()].name)]",
+      "apiVersion": "2019-04-01",
+      "properties": { 
+        "publicAccess": "[parameters('containers')[copyIndex()].publicAccess]"
+      },
+      "copy": {
+        "name": "containercopy",
+        "count": "[length(parameters('containers'))]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
