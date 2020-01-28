@@ -1,0 +1,30 @@
+# Set following variables
+# serviceConnection: Service connection name for target subscription
+# resourceGroup: Name of resource group
+# location: Location of resource group (e.g.: japaneast)
+# environment: Parameters sub directory name. (e.g.: Development, Production)
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: $(serviceConnection)
+    ScriptType: 'FilePath'
+    ScriptPath: 'Scripts\DeployResourceGroup.ps1'
+    ScriptArguments: '-ResourceGroupName $(resourceGroup) -ResourceGroupLocation $(location)'
+    azurePowerShellVersion: LatestVersion
+  displayName: 'Deploy Resource Group'
+
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: $(serviceConnection)
+    ScriptType: 'FilePath'
+    ScriptPath: 'Scripts\DeployResource.ps1'
+    ScriptArguments: -ResourceGroupName $(resourceGroup) -TemplateFile computerVisionDeploy.json -TemplateParameterFile computerVisionParameters.json -Environment $(environment)
+    azurePowerShellVersion: LatestVersion
+  displayName: 'Deploy Computer Vision'
