@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "sqlDatabaseSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "metadata": {
+        "comment": "To determine the SKUs, use 'az sql db list-editions -l <location> -o table' command."
+      }
+    },
+    "sqlDatabaseCapacity": {
+      "type": "int",
+      "defaultValue": 5
+    },
+    "collation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "maxSizeBytes": {
+      "type": "int",
+      "defaultValue": 2147483648
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[concat(parameters('sqlServerName'), '/', parameters('sqlDatabaseName'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sqlDatabaseSku')]",
+        "capacity": "[parameters('sqlDatabaseCapacity')]"
+      },
+      "properties": {
+        "collation": "[parameters('collation')]",
+        "maxSizeBytes": "[parameters('maxSizeBytes')]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

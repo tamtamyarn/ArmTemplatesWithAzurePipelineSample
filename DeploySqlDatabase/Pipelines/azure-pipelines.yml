@@ -1,0 +1,41 @@
+# Set following variables
+# serviceConnection: Service connection name for target subscription
+# resourceGroup: Name of resource group
+# location: Location of resource group (e.g.: japaneast)
+# environment: Parameters sub directory name. (e.g.: Development, Production)
+# administratorName: Name of sql administrator.
+# administratorPassword: Name of administrator password. (Keep this value secret!)
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: $(serviceConnection)
+    ScriptType: 'FilePath'
+    ScriptPath: 'Scripts\DeployResourceGroup.ps1'
+    ScriptArguments: '-ResourceGroupName $(resourceGroup) -ResourceGroupLocation $(location)'
+    azurePowerShellVersion: LatestVersion
+  displayName: 'Deploy Resource Group'
+
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: $(serviceConnection)
+    ScriptType: 'FilePath'
+    ScriptPath: 'Scripts\DeploySqlServer.ps1'
+    ScriptArguments: -ResourceGroupName $(resourceGroup) -TemplateFile sqlServerDeploy.json -TemplateParameterFile sqlServerParameters.json -Environment $(environment) -administratorName $(administratorName) -administratorPassword $(administratorPassword)
+    azurePowerShellVersion: LatestVersion
+  displayName: 'Deploy Sql Server'
+
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: $(serviceConnection)
+    ScriptType: 'FilePath'
+    ScriptPath: 'Scripts\DeployResource.ps1'
+    ScriptArguments: -ResourceGroupName $(resourceGroup) -TemplateFile sqlDatabaseDeploy.json -TemplateParameterFile sqlDatabaseParameters.json -Environment $(environment)
+    azurePowerShellVersion: LatestVersion
+  displayName: 'Deploy Sql Database'
