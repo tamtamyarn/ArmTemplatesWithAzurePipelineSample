@@ -1,0 +1,72 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountType": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_ZRS",
+        "Premium_LRS"
+      ],
+      "defaultValue": "Standard_LRS"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "storageAccountKind": {
+      "type": "string",
+      "defaultValue": "StorageV2"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountNetworkAclsDefaultAction": {
+      "type": "string",
+      "defaultValue": "Deny"
+    },
+    "storageAccountNetworkAclsBypass": {
+      "type": "string",
+      "defaultValue": "None"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "virtual-network"
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "subnet1"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2019-04-01",
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "[parameters('storageAccountKind')]",
+      "properties": {
+        "networkAcls": {
+          "defaultAction": "[parameters('storageAccountNetworkAclsDefaultAction')]",
+          "bypass": "[parameters('storageAccountNetworkAclsBypass')]",
+          "virtualNetworkRules": [
+            {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+              "action": "Allow"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
+  
